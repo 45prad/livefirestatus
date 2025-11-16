@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Challenge Completion Matrix</title>
+
+  <!-- Font Awesome -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.1/js/all.min.js" crossorigin="anonymous"></script>
+  <!-- Tailwind CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 text-gray-800 font-sans">
+  <div class="container mx-auto py-8 px-4">
+
+    <!-- Logo Section -->
+    <div class="w-full max-w-[400px] mx-auto mb-6">
+      <img src="./Cyber-Shakti-2025-Logo.png" alt="Logo" class="w-full h-[150px] object-contain rounded-lg shadow-md" />
+    </div>
+
+    <!-- Title -->
+    <h1 class="text-3xl font-bold mb-6 text-center text-gray-700">
+      Live Fire Challenge Solves
+    </h1>
+
+    <!-- Loading Spinner -->
+    <div id="loading" class="text-center py-8">
+      <i class="fas fa-spinner fa-spin text-3xl text-gray-600"></i>
+      <p class="text-gray-600 mt-2">Loading data...</p>
+    </div>
+
+    <!-- Matrix Table -->
+    <div id="matrix-container" class="overflow-x-auto hidden mt-4 p-4 bg-white rounded-lg shadow-lg">
+      <table class="table-auto border-collapse w-full">
+        <thead id="table-header">
+          <tr>
+            <th class="border px-4 py-3 bg-blue-500 text-white text-left">User</th>
+          </tr>
+        </thead>
+        <tbody id="table-body"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <script>
+    const fetchData = async () => {
+      try {
+        const response = await fetch('http://localhost:5000/api/challenge/completion-matrix');
+        if (!response.ok) throw new Error('Failed to fetch data');
+        const data = await response.json();
+
+        const { users, challenges, completions } = data;
+
+        const tableHeader = document.getElementById('table-header');
+        const tableBody = document.getElementById('table-body');
+        const loadingDiv = document.getElementById('loading');
+        const matrixContainer = document.getElementById('matrix-container');
+
+        // Add challenge titles to header
+        challenges.forEach(challenge => {
+          const th = document.createElement('th');
+          th.className = 'border px-4 py-3 bg-blue-500 text-white text-center';
+          th.textContent = challenge;
+          tableHeader.querySelector('tr').appendChild(th);
+        });
+
+        // Add rows for each user
+        users.forEach(user => {
+          const tr = document.createElement('tr');
+          tr.className = 'even:bg-gray-50 odd:bg-white';
+
+          const tdUser = document.createElement('td');
+          tdUser.className = 'border px-4 py-3 font-medium text-gray-800';
+          tdUser.textContent = user;
+          tr.appendChild(tdUser);
+
+          challenges.forEach(challenge => {
+            const td = document.createElement('td');
+            td.className = 'border px-4 py-3 text-center';
+
+            const completed = completions[user][challenge];
+            const icon = document.createElement('i');
+            icon.className = `fas ${completed ? 'fa-check text-green-500' : 'fa-times text-red-500'} text-lg`;
+            td.appendChild(icon);
+
+            tr.appendChild(td);
+          });
+
+          tableBody.appendChild(tr);
+        });
+
+        // Show table, hide loader
+        loadingDiv.style.display = 'none';
+        matrixContainer.style.display = 'block';
+      } catch (error) {
+        console.error('Error fetching or displaying data:', error);
+        document.getElementById('loading').innerHTML = `
+          <p class="text-red-600 font-semibold">Failed to load data. Please try again later.</p>
+        `;
+      }
+    };
+
+    fetchData();
+  </script>
+</body>
+</html>
