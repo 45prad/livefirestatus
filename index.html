@@ -10,35 +10,54 @@
   <!-- Tailwind CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-gray-100 text-gray-800 font-sans">
-  <div class="container mx-auto py-8 px-4">
+<body class="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 min-h-screen text-gray-100 font-sans">
+  <div class="container mx-auto py-8 px-4 max-w-7xl">
 
     <!-- Logo Section -->
-    <div class="w-full max-w-[400px] mx-auto mb-6">
-      <img src="./Cyber-Shakti-2025-Logo.png" alt="Logo" class="w-full h-[150px] object-contain rounded-lg shadow-md" />
+    <div class="w-full max-w-[400px] mx-auto mb-8">
+      <img src="./Cyber-Shakti-2025-Logo.png" alt="Logo" class="w-full h-[150px] object-contain rounded-lg" />
     </div>
 
     <!-- Title -->
-    <h1 class="text-3xl font-bold mb-6 text-center text-gray-700">
-      Live Fire Challenge Status
-    </h1>
+    <div class="text-center mb-8">
+      <h1 class="text-4xl font-bold mb-2 bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent">
+        Live Fire Challenge Status
+      </h1>
+      <p class="text-gray-400 text-sm">Real-time completion tracking</p>
+    </div>
 
     <!-- Loading Spinner -->
-    <div id="loading" class="text-center py-8">
-      <i class="fas fa-spinner fa-spin text-3xl text-gray-600"></i>
-      <p class="text-gray-600 mt-2">Loading data...</p>
+    <div id="loading" class="text-center py-12">
+      <i class="fas fa-spinner fa-spin text-4xl text-cyan-400"></i>
+      <p class="text-gray-400 mt-4">Loading challenge matrix...</p>
     </div>
 
     <!-- Matrix Table -->
-    <div id="matrix-container" class="overflow-x-auto hidden mt-4 p-4 bg-white rounded-lg shadow-lg">
-      <table class="table-auto border-collapse w-full">
-        <thead id="table-header">
-          <tr>
-            <th class="border px-4 py-3 bg-blue-500 text-white text-left">User</th>
-          </tr>
-        </thead>
-        <tbody id="table-body"></tbody>
-      </table>
+    <div id="matrix-container" class="overflow-x-auto hidden mt-4">
+      <div class="bg-slate-800/50 backdrop-blur-sm rounded-xl shadow-2xl border border-slate-700 overflow-hidden">
+        <table class="table-auto border-collapse w-full">
+          <thead id="table-header">
+            <tr>
+              <th class="border-b border-r border-slate-700 px-6 py-4 bg-gradient-to-r from-slate-700 to-slate-800 text-cyan-400 text-left font-semibold sticky left-0 z-10">
+                Participant
+              </th>
+            </tr>
+          </thead>
+          <tbody id="table-body"></tbody>
+        </table>
+      </div>
+      
+      <!-- Legend -->
+      <div class="mt-6 flex justify-center gap-6 text-sm">
+        <div class="flex items-center gap-2">
+          <div class="w-6 h-6 bg-emerald-500/20 border-2 border-emerald-500 rounded"></div>
+          <span class="text-gray-300">Completed</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <div class="w-6 h-6 bg-slate-700/50 border border-slate-600 rounded"></div>
+          <span class="text-gray-300">Not Completed</span>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -56,32 +75,49 @@
         const loadingDiv = document.getElementById('loading');
         const matrixContainer = document.getElementById('matrix-container');
 
+        // Define custom order for challenges
+        const customOrder = [
+          'Space-Chall1', 'Space-Chall2', 'Space-Chall3', 'Space-Chall4-Part1', 'Space-Chall4-Part2',
+          'MAVLink-Hijack', 'Hack-The-GS', 'Supply-Chain-Attack'
+        ];
+
+        // Sort challenges based on custom order
+        const sortedChallenges = customOrder.filter(c => challenges.includes(c));
+        
+        // Add any remaining challenges not in the custom order
+        challenges.forEach(c => {
+          if (!sortedChallenges.includes(c)) {
+            sortedChallenges.push(c);
+          }
+        });
+
         // Add challenge titles to header
-        challenges.forEach(challenge => {
+        sortedChallenges.forEach(challenge => {
           const th = document.createElement('th');
-          th.className = 'border px-4 py-3 bg-blue-500 text-white text-center';
+          th.className = 'border-b border-slate-700 px-4 py-4 bg-gradient-to-r from-slate-700 to-slate-800 text-cyan-400 text-center font-semibold text-sm';
           th.textContent = challenge;
           tableHeader.querySelector('tr').appendChild(th);
         });
 
         // Add rows for each user
-        users.forEach(user => {
+        users.forEach((user, index) => {
           const tr = document.createElement('tr');
-          tr.className = 'even:bg-gray-50 odd:bg-white';
+          tr.className = 'hover:bg-slate-700/30 transition-colors duration-150';
 
           const tdUser = document.createElement('td');
-          tdUser.className = 'border px-4 py-3 font-medium text-gray-800';
+          tdUser.className = 'border-b border-r border-slate-700 px-6 py-4 font-medium text-gray-200 bg-slate-800/80 sticky left-0 z-10';
           tdUser.textContent = user;
           tr.appendChild(tdUser);
 
-          challenges.forEach(challenge => {
+          sortedChallenges.forEach(challenge => {
             const td = document.createElement('td');
-            td.className = 'border px-4 py-3 text-center';
-
             const completed = completions[user][challenge];
-            const icon = document.createElement('i');
-            icon.className = `fas ${completed ? 'fa-check text-green-500' : 'fa-times text-red-500'} text-lg`;
-            td.appendChild(icon);
+            
+            td.className = `border-b border-slate-700 px-4 py-4 text-center transition-all duration-300 ${
+              completed 
+                ? 'bg-emerald-500/20 hover:bg-emerald-500/30 border-l-2 border-l-emerald-500' 
+                : 'bg-slate-700/30 hover:bg-slate-700/50'
+            }`;
 
             tr.appendChild(td);
           });
@@ -95,7 +131,11 @@
       } catch (error) {
         console.error('Error fetching or displaying data:', error);
         document.getElementById('loading').innerHTML = `
-          <p class="text-red-600 font-semibold">Failed to load data. Please try again later.</p>
+          <div class="bg-red-500/10 border border-red-500/50 rounded-lg p-6 max-w-md mx-auto">
+            <i class="fas fa-exclamation-triangle text-red-400 text-2xl mb-2"></i>
+            <p class="text-red-400 font-semibold">Failed to load challenge data</p>
+            <p class="text-gray-400 text-sm mt-2">Please check your connection and try again later.</p>
+          </div>
         `;
       }
     };
