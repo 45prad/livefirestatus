@@ -20,7 +20,7 @@
 
     <!-- Title -->
     <h1 class="text-3xl font-bold mb-6 text-center text-gray-700">
-      Live Fire Challenge Solves
+      Live Fire Challenge Status
     </h1>
 
     <!-- Loading Spinner -->
@@ -45,7 +45,7 @@
   <script>
     const fetchData = async () => {
       try {
-        const response = await fetch('http://localhost:5000/api/challenge/completion-matrix');
+        const response = await fetch('https://score.cybershakti.co/api/challenge/completion-matrix');
         if (!response.ok) throw new Error('Failed to fetch data');
         const data = await response.json();
 
